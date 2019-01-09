@@ -11,7 +11,7 @@
     (json/read-str
       (:body 
         (client/get
-          (str "https://api.openweathermap.orgg/data/2.5/find?q=" location "&units=metric&appid=" api-key))))
+          (str "https://api.openweathermap.org/data/2.5/find?q=" location "&units=metric&appid=" api-key))))
   )
 )
 
@@ -19,10 +19,10 @@
   ([] (get-temp "London"))
   ([location]
     (try
-      (Thread/sleep 4000)
-      (((((get-weather location) "list") 0) "main") "temp")
+      (Thread/sleep 7000)
+      (.toString (((((get-weather location) "list") 0) "main") "temp"))
       (catch Exception e (str "Couldn't get weather. Caught exception: " (.getMessage e)))
-    )    
+    )
   )
 )
 
