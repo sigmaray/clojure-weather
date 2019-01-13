@@ -49,7 +49,7 @@
 (defn update-tray-icon [tz]
   (.setImage ticon (get-tray-image tz)))
 
-(defn -main []
+(defn setup-ui []
   (let [frame (new JFrame "Weather App")
         location-text (new JTextField "New York")
         main-label (new JLabel "")
@@ -79,3 +79,6 @@
                   (.setSize 400 200)
                   (.setVisible true)
                   (add-tray-icon "N/A"))))
+
+(defn -main []
+  (setup-ui))
