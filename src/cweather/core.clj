@@ -37,7 +37,7 @@
 
 (defn get-tray-image [tz]
   (let [    
-    image (new BufferedImage 32 32 (BufferedImage/TYPE_INT_ARGB))
+    image (new BufferedImage 24 24 (BufferedImage/TYPE_INT_ARGB))
     g2 (.createGraphics image)
     ]
     ; (.setColor g2 Color/white)
@@ -45,7 +45,7 @@
     (.setColor g2 Color/black)
     (.setFont g2 (new Font "TimesRoman" Font/PLAIN, 9))
     ; (.drawString g2 (.toString tz) 0 16)
-    (draw-centered-text g2 (.toString tz) 32 32)
+    (draw-centered-text g2 (.toString tz) 24 24)
 
     image)
   )
@@ -56,9 +56,6 @@
 
 (defn update-tray-icon [tz]
   (.setImage ticon (get-tray-image tz)))
-
-(defn p-update-tray-icon [_ tz]
-  (update-tray-icon tz))
 
 (defn start-tray-cycle-thread []
   (.start (Thread. (fn [] (
@@ -90,14 +87,15 @@
       ;                        (setText temp))
       ;                     (update-tray-icon temp))))))))))
       (doto frame 
-                  (.setDefaultCloseOperation (JFrame/EXIT_ON_CLOSE)) ;uncomment this line to quit app on frame close
-                  (.setLayout (new GridLayout 2 2 3 3))
+                  ; (.setDefaultCloseOperation (JFrame/EXIT_ON_CLOSE)) ;uncomment this line to quit app on frame close
+                  ; (.setLayout (new GridLayout 2 2 3 3))
                   ; (.add location-text)
                   ; (.add main-label)
                   ; (.add get-button)
                   ; (.add temp-label)
-                  (.setSize 400 200)
-                  (.setVisible true))
+                  ; (.setSize 400 200)
+                  ; (.setVisible true)
+                  )
       (add-tray-icon "N/A")
       (start-tray-cycle-thread)))
 
