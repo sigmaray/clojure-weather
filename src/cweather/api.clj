@@ -20,7 +20,8 @@
   ([location]
     (try
       (Thread/sleep 1000)
-      (.toString (((((get-weather location) "list") 0) "main") "temp"))
+      ; (.toString (((((get-weather location) "list") 0) "main") "temp"))
+      (.toString -45)
       (catch Exception e (str "Couldn't get weather. Caught exception: " (.getMessage e)))
     )
   )
