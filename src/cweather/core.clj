@@ -2,7 +2,7 @@
   (:use cweather.api)
   (:import [javax.swing JFrame JLabel JTextField JButton]
           [java.awt.event ActionListener]
-          [java.awt GridLayout AWTException Color Graphics2D SystemTray TrayIcon Font]
+          [java.awt GridLayout AWTException Color Graphics2D SystemTray TrayIcon Font PopupMenu MenuItem]
           [java.awt.image BufferedImage])
 )
 
@@ -36,7 +36,7 @@
 )
 
 (defn get-tray-image [tz]
-  (let [    
+  (let [
     image (new BufferedImage 24 24 (BufferedImage/TYPE_INT_ARGB))
     g2 (.createGraphics image)
     ]
@@ -64,6 +64,19 @@
         (update-tray-icon (get-temp "Moscow"))
         (Thread/sleep 1000)
         (recur))))))))
+
+(defn menu-item [label callback]
+  (let [menu (MenuItem. label)
+        listener (proxy [ActionListener] []
+                   (actionPerformed [event] (callback)))]
+    (.addActionListener menu listener)
+    menu))
+
+; (defn add-exit! [menu]
+;   (.add menu (new-menu-item "Exit" exit)))
+
+; (defn add-hide! [menu]
+;   (.add menu (new-menu-item "Hide" #())))
 
 (defn -setup-ui []
   (let [
@@ -97,6 +110,13 @@
                   ; (.setVisible true)
                   )
       (add-tray-icon "N/A")
+
+
+      (let [popup (PopupMenu.)]
+        (.add popup (menu-item "Exit" #(System/exit 0)))
+        (.setPopupMenu ticon popup)
+        )
+
       (start-tray-cycle-thread)))
 
 (defn -main []
