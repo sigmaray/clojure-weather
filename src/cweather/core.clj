@@ -11,7 +11,7 @@
 
 (defmacro log [& body]
   `(do
-      (println [(kv (str (java.util.Date.))) (kv ~(meta &form)) (kv '~body)])
+      (println [(kv ~(str (java.util.Date.))) (kv ~(meta &form)) (kv '~body)])
       (do ~@body)))
 
 (def ticon nil)
@@ -43,7 +43,7 @@
     ; (.setColor g2 Color/white)
     ; (.fillRect g2 0 0 32 32)
     (.setColor g2 Color/black)
-    (.setFont g2 (new Font "TimesRoman" Font/PLAIN, 9))
+    (.setFont g2 (new Font "DejaVu Sans" Font/PLAIN, 12))
     ; (.drawString g2 (.toString tz) 0 16)
     (draw-centered-text g2 (.toString tz) 24 24)
 
@@ -61,8 +61,8 @@
   (.start (Thread. (fn [] (
     (loop []
       (log
-        (update-tray-icon (get-temp "Moscow"))
-        (Thread/sleep 1000)
+        (update-tray-icon (get-temp "Minsk"))
+        (Thread/sleep (* 1000 60))
         (recur))))))))
 
 (defn menu-item [label callback]
