@@ -6,6 +6,9 @@
           [java.awt.image BufferedImage])
 )
 
+(def CITY "Minsk")
+(def TRAY-SIZE 24)
+
 (defmacro kv [& args]
   `'~(map #(-> [(str %) %]) args))
 
@@ -16,37 +19,25 @@
 
 (def ticon nil)
 
-; public void drawCenteredString(String s, int w, int h, Graphics g) {
-;   FontMetrics fm = g.getFontMetrics();
-;   int x = (w - fm.stringWidth(s)) / 2;
-;   int y = (fm.getAscent() + (h - (fm.getAscent() + fm.getDescent())) / 2);
-;   g.drawString(s, x, y);
-; }
 (defn draw-centered-text [g s w h]
   (let [
     fm  (.getFontMetrics g)
     x (int (/ (- w (.stringWidth fm s)) 2))
-    y (int (+ (.getAscent fm) (/ (- h (+ (.getAscent fm) (.getDescent fm))) 2)))
-    ]
-    (prn [w (.stringWidth fm s)])
-    (prn [(.getAscent fm) h (.getAscent fm) (.getDescent fm)])
-    (prn [g s x y])
+    y (int (+ (.getAscent fm) (/ (- h (+ (.getAscent fm) (.getDescent fm))) 2)))]
     (.drawString g s x y)
   )
 )
 
 (defn get-tray-image [tz]
   (let [
-    image (new BufferedImage 24 24 (BufferedImage/TYPE_INT_ARGB))
+    image (new BufferedImage TRAY-SIZE TRAY-SIZE (BufferedImage/TYPE_INT_ARGB))
     g2 (.createGraphics image)
     ]
     ; (.setColor g2 Color/white)
     ; (.fillRect g2 0 0 32 32)
     (.setColor g2 Color/black)
     (.setFont g2 (new Font "DejaVu Sans" Font/PLAIN, 12))
-    ; (.drawString g2 (.toString tz) 0 16)
-    (draw-centered-text g2 (.toString tz) 24 24)
-
+    (draw-centered-text g2 (.toString tz) TRAY-SIZE TRAY-SIZE)
     image)
   )
 
@@ -61,7 +52,7 @@
   (.start (Thread. (fn [] (
     (loop []
       (log
-        (update-tray-icon (get-temp "Minsk"))
+        (update-tray-icon (get-temp CITY))
         (Thread/sleep (* 1000 60))
         (recur))))))))
 
@@ -72,52 +63,13 @@
     (.addActionListener menu listener)
     menu))
 
-; (defn add-exit! [menu]
-;   (.add menu (new-menu-item "Exit" exit)))
-
-; (defn add-hide! [menu]
-;   (.add menu (new-menu-item "Hide" #())))
-
 (defn -setup-ui []
-  (let [
-        frame (new JFrame "Weather App")
-        ; location-text (new JTextField "New York")
-        ; main-label (new JLabel "")
-        ; get-button (new JButton "Get Weather")
-        ; temp-label (new JLabel "")
-        ]
-      ; (. get-button
-      ;     (addActionListener
-      ;        (proxy [ActionListener] []
-      ;             (actionPerformed [evt]
-      ;                 (.start (Thread. (fn [] (
-      ;                   (. get-button (setEnabled false))
-      ;                   (. main-label
-      ;                        (setText "...Loading..."))
-      ;                   (let [temp (get-temp (. location-text (getText)))]
-      ;                     (. get-button (setEnabled true))
-      ;                     (. main-label
-      ;                        (setText temp))
-      ;                     (update-tray-icon temp))))))))))
-      (doto frame 
-                  ; (.setDefaultCloseOperation (JFrame/EXIT_ON_CLOSE)) ;uncomment this line to quit app on frame close
-                  ; (.setLayout (new GridLayout 2 2 3 3))
-                  ; (.add location-text)
-                  ; (.add main-label)
-                  ; (.add get-button)
-                  ; (.add temp-label)
-                  ; (.setSize 400 200)
-                  ; (.setVisible true)
-                  )
-      (add-tray-icon "N/A")
-
-
-      (let [popup (PopupMenu.)]
-        (.add popup (menu-item "Exit" #(System/exit 0)))
-        (.setPopupMenu ticon popup)
-        )
-
-      (start-tray-cycle-thread)))
+  (let [frame (new JFrame "Clojure Weather App")]
+    (add-tray-icon "N/A")
+    (let [popup (PopupMenu.)]
+      (.add popup (menu-item "Exit" #(System/exit 0)))
+      (.setPopupMenu ticon popup))
+    (start-tray-cycle-thread)))
 
 (defn -main []
   (-setup-ui)
