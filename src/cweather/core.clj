@@ -1,13 +1,37 @@
-(ns cweather.core (:gen-class)
-  (:use cweather.api)
+(ns cweather.core
+  (:gen-class)
   (:import [javax.swing JFrame JLabel JTextField JButton]
           [java.awt.event ActionListener]
           [java.awt GridLayout AWTException Color Graphics2D SystemTray TrayIcon Font PopupMenu MenuItem]
           [java.awt.image BufferedImage])
-)
+  (:require
+          [clj-http.client :as client]
+          [clojure.data.json :as json]))
 
 (def CITY "Minsk")
 (def TRAY-SIZE 24)
+
+(def API-KEY "5a043a1bd95bf3ee500eb89de107b41e")
+
+(defn get-weather
+  ([] (get-weather "London"))
+  ([location] 
+    (json/read-str
+      (:body 
+        (client/get
+          (str "https://api.openweathermap.org/data/2.5/find?q=" location "&units=metric&appid=" API-KEY))))
+  )
+)
+
+(defn get-temp
+  ([] (get-temp "London"))
+  ([location]
+    (try
+      (.toString (((((get-weather location) "list") 0) "main") "temp"))
+      (catch Exception e (prn "Couldn't get weather. Exception caught: " (.getMessage e)) "")
+    )
+  )
+)
 
 (defmacro kv [& args]
   `'~(map #(-> [(str %) %]) args))
@@ -63,7 +87,7 @@
     (.addActionListener menu listener)
     menu))
 
-(defn -setup-ui []
+(defn -main []
   (let [frame (new JFrame "Clojure Weather App")]
     (add-tray-icon "N/A")
     (let [popup (PopupMenu.)]
@@ -71,6 +95,3 @@
       (.setPopupMenu ticon popup))
     (start-tray-cycle-thread)))
 
-(defn -main []
-  (-setup-ui)
-)
