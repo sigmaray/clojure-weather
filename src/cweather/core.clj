@@ -1,6 +1,7 @@
 (ns cweather.core
   (:gen-class)
-  (:import [javax.swing JFrame JLabel JTextField JButton]
+  (:import 
+          [javax.swing JFrame JLabel JTextField JButton]
           [java.awt.event ActionListener]
           [java.awt GridLayout AWTException Color Graphics2D SystemTray TrayIcon Font PopupMenu MenuItem]
           [java.awt.image BufferedImage])
@@ -39,8 +40,7 @@
           (-> (client/get url) (get :body) (json/read-str) (get "list") (get 0) (get "main") (get "temp") (str)))
       (catch Exception e
         (prn "Couldn't get weather. Exception caught: " (.getMessage e))
-        "n/a"))))
-    )
+        "N/A")))))
 
 (defn draw-centered-text [g s w h]
   (let [
@@ -49,48 +49,47 @@
          y (int (+ (.getAscent fm) (/ (- h (+ (.getAscent fm) (.getDescent fm))) 2)))]
     (.drawString g s x y)))
 
-(def ticon nil)
-
-(defn draw-image [tz]
+(defn draw-image [text]
   (let [
-    image (new BufferedImage TRAY-SIZE TRAY-SIZE (BufferedImage/TYPE_INT_ARGB))
-    g2 (.createGraphics image)
-    ]
-    ; (.setColor g2 Color/white)
-    ; (.fillRect g2 0 0 32 32)
-    (.setColor g2 Color/black)
-    (.setFont g2 (new Font "DejaVu Sans" Font/PLAIN, 12))
-    (draw-centered-text g2 (.toString tz) TRAY-SIZE TRAY-SIZE)
-    image)
-  )
+         image (new BufferedImage TRAY-SIZE TRAY-SIZE (BufferedImage/TYPE_INT_ARGB))
+         g (.createGraphics image)
+       ]
+    ; (.setColor g Color/white)
+    ; (.fillRect g 0 0 32 32)
+    (.setColor g Color/black)
+    (.setFont g (new Font "DejaVu Sans" Font/PLAIN, 12))
+    (draw-centered-text g (.toString text) TRAY-SIZE TRAY-SIZE)
+    image))
 
-(defn add-tray-icon [tz]
-  (def ticon (new TrayIcon (draw-image tz) "Weather Tray"))
-  (.add (SystemTray/getSystemTray) ticon))
+(defn add-tray-icon [text]
+  (let [ticon (new TrayIcon (draw-image text) "Weather Tray")]
+    (.add (SystemTray/getSystemTray) ticon)
+    ticon))
 
-(defn update-tray-icon [tz]
-  (.setImage ticon (draw-image tz)))
+(defn update-tray-icon [ticon text]
+  (.setImage ticon (draw-image text)))
 
-(defn weather-loop []
+(defn weather-loop [ticon]
   (.start (Thread. (fn [] (
     (loop []
       (log
-        (update-tray-icon (get-temp CITY))
+        (update-tray-icon ticon (get-temp CITY))
         (Thread/sleep (* 1000 60))
         (recur))))))))
 
 (defn menu-item [label callback]
-  (let [menu (MenuItem. label)
-        listener (proxy [ActionListener] []
-                   (actionPerformed [event] (callback)))]
+  (let [
+         menu (MenuItem. label)
+         listener (proxy [ActionListener] [] (actionPerformed [event] (callback)))]
     (.addActionListener menu listener)
     menu))
 
 (defn -main []
-  (let [frame (new JFrame "Clojure Weather App")]
-    (add-tray-icon "N/A")
+  (let [
+         frame (new JFrame "Clojure Weather App")
+         ticon (add-tray-icon "N/A")]
+    
     (let [popup (PopupMenu.)]
       (.add popup (menu-item "Exit" #(System/exit 0)))
       (.setPopupMenu ticon popup))
-    (weather-loop)))
-
+    (weather-loop ticon)))
