@@ -33,12 +33,22 @@
   )
 )
 
-(defmacro kv [& args]
-  `'~(map #(-> [(str %) %]) args))
+; (defmacro to-hash
+;   "Convert expression into hasmap.
+;   Example:
+;   => (to-hash (+ 1 2))
+;   {(+ 1 2) 3}"
+;   [arg] `{'~arg ~arg}) 
 
-(defmacro log [& body]
+(defmacro log
+  "Log expression to console and execute it.
+  Example:
+  => (log (+ 1 2))
+  [#inst \"2019-01-23T09:02:52.479-00:00\" {:line 1, :column 1} ((+ 1 2))]
+  3"
+  [& body]
   `(do
-      (println [(kv ~(str (java.util.Date.))) (kv ~(meta &form)) (kv '~body)])
+      (println [(java.util.Date.) ~(meta &form) '~body])
       (do ~@body)))
 
 (def ticon nil)
