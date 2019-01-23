@@ -12,30 +12,6 @@
 (def TRAY-SIZE 24)
 (def API-KEY "5a043a1bd95bf3ee500eb89de107b41e")
 
-(defn get-weather
-  ([] (get-weather "London"))
-  ([location] 
-    
-  )
-)
-
-(defn get-temp
-  ([] (get-temp "London"))
-  ([location]
-    (try
-      (str
-        (
-          (
-            (
-              (
-                (json/read-str
-                  (
-                    (client/get
-                        (str "https://api.openweathermap.org/data/2.5/find?q=" location "&units=metric&appid=" API-KEY)) :body)) "list") 0) "main") "temp")
-        )
-    (catch Exception e
-      (prn "Couldn't get weather. Exception caught: " (.getMessage e)) ""))))
-
 ; (defmacro to-hash
 ;   "Convert expression into hasmap.
 ;   Example:
@@ -54,18 +30,28 @@
       (println [(java.util.Date.) ~(meta &form) '~body])
       (do ~@body)))
 
-(def ticon nil)
+(defn get-temp
+  ([] (get-temp "London"))
+  ([location]
+    (let [url (str "https://api.openweathermap.org/data/2.5/find?q=" location "&units=metric&appid=" API-KEY)]
+      (try
+        (str
+          (-> (client/get url) (get :body) (json/read-str) (get "list") (get 0) (get "main") (get "temp") (str)))
+      (catch Exception e
+        (prn "Couldn't get weather. Exception caught: " (.getMessage e))
+        "n/a"))))
+    )
 
 (defn draw-centered-text [g s w h]
   (let [
-    fm  (.getFontMetrics g)
-    x (int (/ (- w (.stringWidth fm s)) 2))
-    y (int (+ (.getAscent fm) (/ (- h (+ (.getAscent fm) (.getDescent fm))) 2)))]
-    (.drawString g s x y)
-  )
-)
+         fm  (.getFontMetrics g)
+         x (int (/ (- w (.stringWidth fm s)) 2))
+         y (int (+ (.getAscent fm) (/ (- h (+ (.getAscent fm) (.getDescent fm))) 2)))]
+    (.drawString g s x y)))
 
-(defn get-tray-image [tz]
+(def ticon nil)
+
+(defn draw-image [tz]
   (let [
     image (new BufferedImage TRAY-SIZE TRAY-SIZE (BufferedImage/TYPE_INT_ARGB))
     g2 (.createGraphics image)
@@ -79,13 +65,13 @@
   )
 
 (defn add-tray-icon [tz]
-  (def ticon (new TrayIcon (get-tray-image tz) "Weather Tray"))
+  (def ticon (new TrayIcon (draw-image tz) "Weather Tray"))
   (.add (SystemTray/getSystemTray) ticon))
 
 (defn update-tray-icon [tz]
-  (.setImage ticon (get-tray-image tz)))
+  (.setImage ticon (draw-image tz)))
 
-(defn start-tray-cycle-thread []
+(defn weather-loop []
   (.start (Thread. (fn [] (
     (loop []
       (log
@@ -106,5 +92,5 @@
     (let [popup (PopupMenu.)]
       (.add popup (menu-item "Exit" #(System/exit 0)))
       (.setPopupMenu ticon popup))
-    (start-tray-cycle-thread)))
+    (weather-loop)))
 
