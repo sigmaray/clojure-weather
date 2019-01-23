@@ -32,7 +32,7 @@
       (do ~@body)))
 
 (defn get-temp
-  ([] (get-temp "London"))
+  ([] (get-temp "Minsk"))
   ([location]
     (let [url (str "https://api.openweathermap.org/data/2.5/find?q=" location "&units=metric&appid=" API-KEY)]
       (try
@@ -87,9 +87,8 @@
 (defn -main []
   (let [
          frame (new JFrame "Clojure Weather App")
+         popup (PopupMenu.)
          ticon (add-tray-icon "N/A")]
-    
-    (let [popup (PopupMenu.)]
-      (.add popup (menu-item "Exit" #(System/exit 0)))
-      (.setPopupMenu ticon popup))
+    (.add popup (menu-item "Exit" #(System/exit 0)))
+    (.setPopupMenu ticon popup)
     (weather-loop ticon)))
