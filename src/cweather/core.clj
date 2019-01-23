@@ -10,16 +10,12 @@
 
 (def CITY "Minsk")
 (def TRAY-SIZE 24)
-
 (def API-KEY "5a043a1bd95bf3ee500eb89de107b41e")
 
 (defn get-weather
   ([] (get-weather "London"))
   ([location] 
-    (json/read-str
-      (:body 
-        (client/get
-          (str "https://api.openweathermap.org/data/2.5/find?q=" location "&units=metric&appid=" API-KEY))))
+    
   )
 )
 
@@ -27,11 +23,18 @@
   ([] (get-temp "London"))
   ([location]
     (try
-      (.toString (((((get-weather location) "list") 0) "main") "temp"))
-      (catch Exception e (prn "Couldn't get weather. Exception caught: " (.getMessage e)) "")
-    )
-  )
-)
+      (str
+        (
+          (
+            (
+              (
+                (json/read-str
+                  (
+                    (client/get
+                        (str "https://api.openweathermap.org/data/2.5/find?q=" location "&units=metric&appid=" API-KEY)) :body)) "list") 0) "main") "temp")
+        )
+    (catch Exception e
+      (prn "Couldn't get weather. Exception caught: " (.getMessage e)) ""))))
 
 ; (defmacro to-hash
 ;   "Convert expression into hasmap.
