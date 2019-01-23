@@ -5,16 +5,6 @@
 ; (def api-key "b6907d289e10d714a6e88b30761fae22")
 (def api-key "5a043a1bd95bf3ee500eb89de107b41e")
 
-(defn get-weather
-  ([] (get-weather "London"))
-  ([location] 
-    (json/read-str
-      (:body 
-        (client/get
-          (str "https://api.openweathermap.org/data/2.5/find?q=" location "&units=metric&appid=" api-key))))
-  )
-)
-
 (defn get-temp
   ([] (get-temp "London"))
   ([location]
@@ -25,8 +15,4 @@
       (catch Exception e (prn "Couldn't get weather. Exception caught: " (.getMessage e)) "")
     )
   )
-)
-
-(defn get-name []
-  ((((get-weather) "list") 0) "name")
 )
