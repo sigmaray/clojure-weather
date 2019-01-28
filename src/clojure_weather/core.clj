@@ -1,4 +1,4 @@
-(ns cweather.core
+(ns clojure-weather.core
   (:gen-class)
   (:import 
           [javax.swing JFrame JLabel JTextField JButton]
@@ -9,16 +9,16 @@
           [clj-http.client :as client]
           [clojure.data.json :as json]))
 
-(def CITY "Minsk")
+(def CITY "Berlin")
 (def TRAY-SIZE 24)
 (def API-KEY "5a043a1bd95bf3ee500eb89de107b41e")
 
-; (defmacro to-hash
-;   "Convert expression into hasmap.
-;   Example:
-;   => (to-hash (+ 1 2))
-;   {(+ 1 2) 3}"
-;   [arg] `{'~arg ~arg}) 
+(defmacro to-hash
+  "Convert expression into hasmap.
+  Example:
+  => (to-hash (+ 1 2))
+  {(+ 1 2) 3}"
+  [arg] `{'~arg ~arg}) 
 
 (defmacro log
   "Log expression to console and execute it.
