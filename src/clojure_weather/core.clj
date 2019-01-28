@@ -32,7 +32,7 @@
       (do ~@body)))
 
 (defn get-temp
-  ([] (get-temp "Minsk"))
+  ([] (get-temp "New York"))
   ([location]
     (let [url (str "https://api.openweathermap.org/data/2.5/find?q=" location "&units=metric&appid=" API-KEY)]
       (try
