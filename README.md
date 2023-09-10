@@ -1,6 +1,6 @@
 # clojure-weather
 
-Show temperature in tray icon.
+It is showing temperature in tray icon.
 
 ![screenshot at 2019 01 28 20 13 19 png png image 4480 x 1158 pixels 1](https://user-images.githubusercontent.com/1594701/51853505-8308a280-2339-11e9-8877-0dad7cca7bfd.png)
 
